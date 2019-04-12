@@ -14,68 +14,56 @@ M;20;22;23;19.2;21.2;21.6;18;20;19
 N;21;23;24;20.2;22.2;22.6;19;21;20
 O;22;24;25;21.2;23.2;23.6;20;22;21"
 
-profile_text <- read.table(text=profile, header=T, row.names=1, quote="",sep=";", check.names=F)
-# ÔÚmeltÊ±±£ÁôÎ»ÖÃÐÅÏ¢
-# melt¸ñÊ½ÊÇggplot2»­Í¼×îÏ²»¶µÄ¸ñÊ½
-# ºÃºÃÌå»áÏÂÕâ¸ö¸ñÊ½£¬ËäÈ»¶àÕ¼ÓÃÁË²»ÉÙ¿Õ¼ä£¬µ«ÊÇÈ·ÊµºÜ·½±ã
+profile_text <- read.table(text=profile, header=T,  quote="",sep=";", check.names=F)
+rownames(profile_text[1,1]) <- 'id'
 
 library(ggplot2)
 library(reshape2)
-data_m <- melt(profile_text)
+data_m <- melt(profile_text,id.vars = 'Name')
+??reshape2
 head(data_m)
-# variableºÍvalueÎª¾ØÕómeltºóµÄÁ½ÁÐµÄÃû×Ö£¬ÄÚ²¿±äÁ¿, variable´ú±íÁËµãÏßµÄÊôÐÔ£¬value´ú±í¶ÔÓ¦µÄÖµ¡£
+# 
 p <- ggplot(data_m, aes(x=variable, y=value),color=variable) + 
   geom_boxplot() + 
   theme(axis.text.x=element_text(angle=50,hjust=0.5, vjust=0.5)) +
   theme(legend.position="none")
-p
-# Í¼»á´æ´¢ÔÚµ±Ç°Ä¿Â¼µÄRplots.pdfÎÄ¼þÖÐ£¬Èç¹ûÓÃRstudio£¬¿ÉÒÔ²»ÔËÐÐdev.off()
+
 dev.off()
-# variableºÍvalueÎª¾ØÕómeltºóµÄÁ½ÁÐµÄÃû×Ö£¬ÄÚ²¿±äÁ¿, variable´ú±íÁËµãÏßµÄÊôÐÔ£¬value´ú±í¶ÔÓ¦µÄÖµ¡£
+# ç®±çº¿å›¾
 p <- ggplot(data_m, aes(x=variable, y=value),color=variable) + 
   geom_boxplot(aes(fill=factor(variable))) + 
   theme(axis.text.x=element_text(angle=50,hjust=0.5, vjust=0.5)) +
   theme(legend.position="none")
 p
-# Í¼»á´æ´¢ÔÚµ±Ç°Ä¿Â¼µÄRplots.pdfÎÄ¼þÖÐ£¬Èç¹ûÓÃRstudio£¬¿ÉÒÔ²»ÔËÐÐdev.off()
+
 dev.off()
-# variableºÍvalueÎª¾ØÕómeltºóµÄÁ½ÁÐµÄÃû×Ö£¬ÄÚ²¿±äÁ¿, variable´ú±íÁËµãÏßµÄÊôÐÔ£¬value´ú±í¶ÔÓ¦µÄÖµ¡£
+# å°æç´å›¾
 p <- ggplot(data_m, aes(x=variable, y=value),color=variable) + 
-  geom_violin(aes(fill=factor(variable))) + 
+  geom_violinboxplotill=factor(variable))) + 
   theme(axis.text.x=element_text(angle=50,hjust=0.5, vjust=0.5)) +
   theme(legend.position="none")
 p
-# Í¼»á´æ´¢ÔÚµ±Ç°Ä¿Â¼µÄRplots.pdfÎÄ¼þÖÐ£¬Èç¹ûÓÃRstudio£¬¿ÉÒÔ²»ÔËÐÐdev.off()
 dev.off()
 
 library(ggbeeswarm)
-# ÎªÁË¸üºÃµÄÐ§¹û£¬Ö»±£ÁôÆäÖÐÒ»¸öÑùÆ·µÄÊý¾Ý
-# greplÀàËÆÓÚLinuxµÄgrepÃüÁî£¬»ñÈ¡ÌØ¶¨Ä£Ê½µÄ×Ö·û´®
 data_m2 <- data_m[grepl("_3", data_m$variable),]
-# variableºÍvalueÎª¾ØÕómeltºóµÄÁ½ÁÐµÄÃû×Ö£¬ÄÚ²¿±äÁ¿, variable´ú±íÁËµãÏßµÄÊôÐÔ£¬value´ú±í¶ÔÓ¦µÄÖµ¡£
 p <- ggplot(data_m2, aes(x=variable, y=value),color=variable) + 
   geom_quasirandom(aes(colour=factor(variable))) + 
   theme_bw() + theme(panel.grid.major = element_blank(),
                      panel.grid.minor = element_blank(), legend.key=element_blank()) +
   theme(legend.position="none")
-# Ò²¿ÉÒÔÓÃgeom_jitter(aes(colour=factor(variable)))´úÌægeom_quasirandom(aes(colour=factor(variable)))
-# µ«¸öÈËÈÏÎªgeom_quasirandom¸ø³öµÄ½á¹û¸üÓÐÌØÉ«
 ggsave(p, filename="jitterplot.pdf", width=14, height=8, units=c("cm"))
 p
-#»æÖÆµ¥¸ö»ùÒò (A)µÄÏäÏßÍ¼
+
 profile="Name;2cell_1;2cell_2;2cell_3;2cell_4;2cell_5;2cell_6;4cell_1;4cell_2;4cell_3;4cell_4;4cell_5;4cell_6;zygote_1;zygote_2;zygote_3;zygote_4;zygote_5;zygote_6
 A;4;6;7;5;8;6;3.2;5.2;5.6;3.6;7.6;4.8;2;4;3;2;4;2.5
 B;6;8;9;7;10;8;5.2;7.2;7.6;5.6;9.6;6.8;4;6;5;4;6;4.5"
 profile_text <- read.table(text=profile, header=T, row.names=1, quote="",sep=";", check.names=F)
 data_m = data.frame(t(profile_text['A',]))
 data_m$sample = rownames(data_m)
-# Ö»ÌôÑ¡ÏÔÊ¾²¿·Ö
-# greplÇ°ÃæÒÑ¾­½²¹ýÓÃÓÚÆ¥Åä
+
 data_m[grepl('_[123]', data_m$sample),]
-#»ñµÃÑùÆ··Ö×éÐÅÏ¢ (Õâ¸öÀý×Ó±È½ÏÌØÊâ£¬ÑùÆ·µÄ·Ö×éÐÅÏ¢¾ÍÊÇÑùÆ·Ãû×ÖÏÂ»®ÏßÇ°ÃæµÄ²¿·Ö)
-# ¿ÉÒÔÀûÓÃstrsplit·Ö¸î£¬È¡³öÆäÇ°ÃæµÄ×Ö·û´®
-# RÖÐ¸´ÔÓµÄÊä³ö½á¹û¶àÊýÒÔÁÐ±íµÄÐÎÊ½ÌåÏÖ£¬ÔÚÖ®Ç°µÄ¾ØÕó²Ù×÷½Ì³ÌÖÐ
-# Ìáµ½¹ýÓÃstrº¯ÊýÀ´²é¿´¸´ÔÓ½á¹ûµÄ½á¹¹£¬²¢´ÓÖÐ»ñÈ¡ÐÅÏ¢
+
 group = unlist(lapply(strsplit(data_m$sample,"_"), function(x) x[1]))
 data_m$group = group
 data_m[grepl('_[123]', data_m$sample),]
@@ -104,22 +92,13 @@ zygote_6;zygote
 
 #data_m <- merge(data_m, sampleGroup, by="row.names")
 
-# »á»ñµÃÏàÍ¬µÄ½á¹û£¬½Å±¾×¢ÊÍµôÁËÒÔÃâÖØ¸´Ö´ÐÐÒýÆðÎÊÌâ¡£
-
-¾ØÕó×¼±¸ºÃÁË£¬¿ªÊ¼»­Í¼ÁË (Ð¡ÌáÇÙÍ¼×öÀý×Ó£¬ÆäËüÀàËÆ)
-# µ÷ÕûÏÂÑùÆ·³öÏÖµÄË³Ðò
 data_m$group <- factor(data_m$group, levels=c("zygote","2cell","4cell"))
-# groupºÍAÎª¾ØÕóÖÐÁ½ÁÐµÄÃû×Ö£¬group´ú±íÁËÖµµÄÊôÐÔ£¬A´ú±í»ùÒòA¶ÔÓ¦µÄ±í´ïÖµ¡£
-# ×¢Òâ¿´ÐÞ¸ÄÁËµÄµØ·½
+
 p <- ggplot(data_m, aes(x=group, y=A),color=group) + 
   geom_violin(aes(fill=factor(group))) + 
   theme(axis.text.x=element_text(angle=50,hjust=0.5, vjust=0.5)) +
   theme(legend.position="none")
 p
-# Í¼»á´æ´¢ÔÚµ±Ç°Ä¿Â¼µÄRplots.pdfÎÄ¼þÖÐ£¬Èç¹ûÓÃRstudio£¬¿ÉÒÔ²»ÔËÐÐdev.off()
-
-#³¤¾ØÕó»æÖÆÏäÏßÍ¼
-#³£¹æ¾ØÕó»æÖÆÏäÏßÍ¼ÒªÇó±ØÐëÊÇ¸ö·½ÕýµÄ¾ØÕóÊäÈë£¬¶øÓÐÊ±Ïë±È½ÏµÄ¼¸¸ö×éÀïÃæ¼ì²âµÄÖµÊýÄ¿²»Í¬¡£±ÈÈçÓÐÈý¸ö×é£¬GrpA×é¼ì²âÁË6¸ö²¡ÈË£¬GrpB×é¼ì²âÁË10¸ö²¡ÈË£¬GrpC×éÊÇ12¸öÕý³£ÈËµÄ¼ì²âÊý¾Ý¡£ÕâÊ±¾ÍºÜÄÑÐÎ³ÉÒ»¸öÐÐÎ»¼ì²âÖµ£¬ÁÐÎªÑùÆ·µÄ¾ØÕó£¬³¤±í¸ñÄ£Ê½¾ÍÊÊºÏÓëÕâÖÖÇé¿ö¡£
 long_table <- "Grp;Value
 GrpA;10
 GrpA;11
@@ -139,4 +118,68 @@ theme(axis.text.x=element_text(angle=50,hjust=0.5, vjust=0.5)) +
 theme(legend.position="none")
 p
 dev.off()
-#³¤±í¸ñÐÎÊ½×ÔÉí¾ÍÊÇ³£¹æ¾ØÕómeltºóµÄ¸ñÊ½£¬ÕâÖÖÓÃÀ´»æÖÆÏäÏßÍ¼¾ÍºÜ¼òµ¥ÁË£¬¾Í²»×ö½âÊÍÁË¡£
+
+# Î±å¤šæ ·æ€§
+library(ggplot2)
+library(magrittr)
+library(ggpubr)
+alpha_data <- read.table('alpha.txt',header = T,row.names = 1,sep = '\t') 
+design <- read.table('mappingfile.txt',header = T,row.names = 1,sep = '\t',
+                     comment.char = '',check.names = F)
+data <- cbind(alpha_data,design[match(rownames(alpha_data),rownames(design)),])
+group <- design['Group1']
+head(data)
+p <- ggplot(data,aes(genotype,shannon,color=genotype))+
+  geom_boxplot(alpha=1,outlier.size = 0,size=0.7,width=0.5,fill='transparent')+
+  geom_jitter(position = position_jitter(0.2),size=1,alpha=0.7)+
+  labs(x='Groups',y='shannon')
+mycompare <- list(c('A','B'),c('A','C'),c('B','C'))
+p <- p + stat_compare_means(comparisons = mycompare,label='p.signif',method='wilcox')
+
+anova <- aov(shannon~data$genotype,data = data) 
+
+
+# Î±å¤šæ ·æ€§
+library("ggplot2") # load related packages
+
+# è¯»å…¥å®žéªŒè®¾è®¡å’ŒAlphaå¤šæ ·æ€§å€¼
+design <- read.table('mappingfile.txt',header = T,row.names = 1,sep = '\t',
+                     comment.char = '',check.names = F)
+alpha = read.table("alpha.txt", header=T, row.names= 1, sep="\t")
+# ä»¥Observed OTUä¸ºä¾‹è¿›è¡Œå¯è§†åŒ–å’Œç»Ÿè®¡åˆ†æžï¼Œå…¶å®ƒæŒ‡æ•°å°†observed_otusæ›¿æ¢ä¸ºshannon, chao1, PD_whole_treeå³å¯è®¡ç®—
+# åˆå¹¶AlphaæŒ‡æ•°ä¸Žå®žéªŒè®¾è®¡
+index = cbind(alpha, design[match(rownames(alpha), rownames(design)), ]) 
+# ç»˜å›¾ä»£ç ã€é¢„è§ˆã€ä¿å­˜PDF
+p = ggplot(index, aes(x=genotype, y=observed_otus, color=genotype))+
+  geom_boxplot(alpha=1, outlier.size=0, size=0.7, width=0.5, fill="transparent") +  
+  geom_jitter( position=position_jitter(0.17), size=1, alpha=0.7)+
+  labs(x="Groups", y="observed_otus index")
+p
+ggsave(paste("alpha_observed_otus.pdf", sep=""), p, width = 5, height = 3)
+
+# ç»Ÿè®¡ç»„é—´æ˜¯å¦æ˜¾è‘—å·®å¼‚
+# æŒ‡å®šå¤šé‡æ¯”è¾ƒçš„åˆ†ç»„å¯¹ 
+# æ·»åŠ æ˜Ÿå·æ˜¾è‘—æ€§æ ‡è®° ,wilcoxonéžå‚æ•°æ£€éªŒ 
+p <- p+stat_compare_means(comparisons=data$genotype,label = "p.signif",
+                          method = 'wilcox') 
+# æ·»åŠ æ˜¾è‘—æ€§æ ‡è®°å‚æ•°æ£€éªŒï¼Œè¦æ±‚Î±å¤šæ ·æŒ‡æœä»Žæ­£æ€åˆ†å¸ƒ 
+#anovaå¯¹æŒ‡æ•°ä¸Žåˆ†ç»„ç»Ÿè®¡ 
+anova <- aov(shannon~Group1,data = data) plotdata<-duncan.test(anova,"Group1",console = TRUE, alpha = 0.05) plotdata<-data.frame(id=rownames(plotdata$groups),plotdata$groups) p<-p+geom_text(data = plotdata,aes(x=id,y=7,label=groups)) p #
+# anovaå¯¹æŒ‡æ•°ä¸Žåˆ†ç»„ç»Ÿè®¡
+library(agricolae)
+observed_otus_stats <- aov(observed_otus ~ genotype, data = index)
+plotdata <- duncan.test(observed_otus_stats,'genotype',console=T,alpha=0.5)
+plotdata <- data.frame(id=rownames(plotdata$groups),plotdata$groups)
+p <- p + geom_text(plotdata,aes(x=id,y=7,label=groups))
+# ä½¿ç”¨TukeyHSDå¯¹ç»„é—´è¿›è¡Œæ£€éªŒï¼Œæ•ˆæ­£pvalue
+Tukey_HSD_observed_otus <- TukeyHSD(observed_otus_stats, ordered = FALSE, conf.level = 0.95)
+# ç»“æžœä¸­æå–éœ€è¦çš„ç»“æžœ
+plotdata <- data.frame(id=rownames(Tukey_HSD_observed_otus$genotype),Tukey_HSD_observed_otus$genotype)
+Tukey_HSD_observed_otus_table <- as.data.frame(Tukey_HSD_observed_otus$genotype)
+# é¢„è§ˆç»“æžœ
+Tukey_HSD_observed_otus_table
+# ä¿å­˜ç»“æžœåˆ°æ–‡ä»¶ï¼ŒæŒ‰Pvauleå€¼ç”±å°åˆ°å¤§æŽ’åº
+write.table(Tukey_HSD_observed_otus_table[order(Tukey_HSD_observed_otus_table$p, decreasing=FALSE), ], 
+            file="alpha_observed_otus_stats.txt",append = FALSE, 
+            quote = FALSE, sep="\t",eol = "\n", na = "NA", dec = ".", 
+            row.names = TRUE,col.names = TRUE)

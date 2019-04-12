@@ -1,0 +1,70 @@
+---
+title: "RandomForest预测菌群模型"
+author: "hua"
+date: "2019年3月12日"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+以iris数据集为例
+
+```{r iris}
+summary(iris)
+library(randomForest)
+library(pROC)
+data(iris)
+set.seed(100)
+ind <- sample(2,nrow(iris),replace = T,prob = c(0.8,0.2))
+iris.rf <- randomForest(Species ~ .,iris[ind==1,],ntree=50,nPerm=10,mtry=3,proximity=T,importance=T)
+head(iris.rf)
+iris.pred <- predict(iris.rf,iris[ind==2,])
+print(iris.pred)
+table(observed=iris[ind==2,'Species'],predicted = iris.pred)
+importance(iris.rf,type=2)
+plot(iris.rf)
+print(iris.rf)
+MDSplot(iris.rf,iris$Species)
+varImpPlot(iris.rf)
+```
+
+## randomforest构建菌群模型
+
+导入数据
+
+```{r otu_table, echo=FALSE}
+setwd('D://data/qiime-data/q1-PE250/result/')
+design <-read.table('mappingfile.txt',row.names = 1,header = T,comment.char = '')
+otu_table <- read.table('sum_taxa/otu_table4_L5.txt',header = T,row.names = 1,sep = '\t',comment.char = '')
+# 数据筛选
+sub_design <- design[design$genotype %in% c('OE','WT'),]
+idx <- rownames(sub_design) %in% colnames(otu_table)
+sub_design <- sub_design[idx,]
+sub_otu <- otu_table[,rownames(sub_design)]
+data <- as.data.frame(t(sub_otu))
+data <- cbind(data,sub_design)
+data <- rbind(data,group)
+data <- data[,1:118 ]
+data <- data[,-115:-117]
+```
+
+设置数据集
+```{r}
+set.seed(315)
+ind <- sample(2,nrow(data),replace = T,prob = c(0.7,0.3))
+trainset <- data[ind ==1,]
+testset <- data[ind ==2,]
+set.seed(315)
+# logistic 回归，生成概率预测值
+model <- glm(genotype ~ . , data=trainset ,family = 'binomial', )
+pre <- predict(model,type = 'response')
+# 合并数据
+model.pre <- data.frame(prob=pre,obs=trainset$genotype)
+# 按预测值排序
+
+```
+
