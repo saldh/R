@@ -4,8 +4,8 @@ library(ggplot2)
 data_m <- melt(data, id.vars=c("index"))
 head(data_m)
 data_m$value <- log10(data_m$value +1)
-data_m$index = factor(data_m$index,levels = c("AX96","AX91","AX94","AX105",
-                                              "AX92","AX108","AX89","AX93","AX95","AX90"))
+data_m$index = factor(data_m$index,levels = c("AX96","AX91","AX94","AX105","AX92","AX108","AX89","AX93","AX95","AX90"))
+# 或者用 scale_x_discrete(limits=c("AX96","AX91","AX94","AX105","AX92","AX108","AX89","AX93","AX95","AX90"))进行x轴排序
 p <- ggplot(data_m, aes(x=index,y=variable)) + 
   xlab("samples") + theme_bw() + 
   theme(panel.grid.major = element_blank()) + 
@@ -19,7 +19,7 @@ ggsave(p, filename="chorain-heatmap2.pdf", width=15,
        height=10, units=c("cm"),colormodel="srgb")
 
 
-#pheatmap
+# pheatmap
 library('pheatmap')
 data1 <- read.csv('D:/share/q2/result/level-4.csv',
                   header = T,sep = ',',row.names = 1)
@@ -38,7 +38,7 @@ pheatmap(log10(x+1),main = 'Heatmap',
          border_color = "white",
          color = colorRampPalette(c("#FFFAF0","#FFE4E1",'#EE5C42'))(30))
 
-#
+# heatmap.2
 install.packages("gplots")
 library(gplots)
 class(data)
@@ -47,8 +47,39 @@ data_m <- as.matrix(t(data))
 heatmap.2(data_m,Rowv=TRUE, Colv=FALSE, scale="column", 
           trace="none", col=redgreen, xlab="index", 
           ylab="variable", margins=c(10,15))
+plot_color = c('orange','green')[treatment]
+# treatment为meta data中提取出的分组信息，必须为一个factor
+# 如果在input data中把sampleID整理为分组的顺序，那么会在colsidecolors这里显示为整齐的分为两组。
+heatmap.2(x,               #Input必须是matrix
+          trace="none",    # trace可以给每个色块中添加一条线，与行平行或者与列平行。其与色块中心的距离代表了这个值被显示的比例。
+          scale="none",    # scale在这里
+          ColSideColors = plot_color,   # 按照treatment组别给每个subject一个颜色
+          dendrogram = "row",   # 生成row的系统发生树
+          symbreaks = TRUE,
+          col=rev(colorRampPalette(brewer.pal(10, "RdBu"))(20)),  # color key, 后面详叙
+          breaks = seq(-0.5,0.5,0.05),   # 还是color key
+          density.info=c("none"),  # 还是color key
+          margins=c(8,16),  # 调整热图大小比例
+          cexRow = 0.8, cexCol = 1.0,   # 行列名字体大小
+          srtCol = 45, offsetCol = -0.5 # 调整列名的字体倾斜45度，距离热图的距离缩小。
+)
+ ## A more decorative heatmap, with z-score scaling along columns
+ ##
+ hv <- heatmap.2(x, col=cm.colors(255), scale="column",
+	       RowSideColors=rc, ColSideColors=cc, margin=c(5, 10),
+	       xlab="specification variables", ylab= "Car Models",
+	       main="heatmap(<Mtcars data>, ..., scale=\"column\")",
+         tracecol="green", density="density")
+ ## Note that the breakpoints are now symmetric about 0
 
-?geom_bar
+ ## Color the labels to match RowSideColors and ColSideColors
+ hv <- heatmap.2(x, col=cm.colors(255), scale="column",
+         RowSideColors=rc, ColSideColors=cc, margin=c(5, 10),
+	       xlab="specification variables", ylab= "Car Models",
+	       main="heatmap(<Mtcars data>, ..., scale=\"column\")",
+         tracecol="green", density="density", colRow=rc, colCol=cc,
+         srtCol=45, adjCol=c(0.5,1))
+
 
 library('ggtree')
 tree <- read.tree("D:/share/q5/result/rep_seqs_k5.tree")
@@ -80,9 +111,8 @@ otu_table = read.delim("D:/share/q5/temp/otu_table.txt",
                        row.names= 1,  header=T, sep="\t")
 otu_table
 ## 读取实验设计
-design = read.table("D:/share/q5/metadata.tsv", 
+design = read.table("~/metadata.tsv", 
                     header=T, row.names= 1, sep="\t")
-design
 ## 取实验设计和OTU表中的交集:样本可能由于实验或测序量不足而舍弃掉，每次分析都要筛选数据
 idx=intersect(rownames(design),colnames(otu_table))
 sub_design=design[idx,]
